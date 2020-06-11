@@ -1,0 +1,9 @@
+apiVersion: v2
+name: consul-proxy
+description: Consul Envoy proxy for external service (such as RDS)
+
+type: application
+
+version: 0.1.1
+
+appVersion: 1.0.0

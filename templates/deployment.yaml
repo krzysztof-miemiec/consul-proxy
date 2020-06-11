@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.name }}"
+
+spec:
+  selector:
+    matchLabels:
+      app: "{{ .Values.name }}"
+
+  template:
+    metadata:
+      name: "{{ .Values.name }}"
+      labels:
+        app: "{{ .Values.name }}"
+      annotations:
+        "consul.hashicorp.com/connect-inject": "true"
+        "consul.hashicorp.com/connect-service": "{{ .Values.name }}"
+        "consul.hashicorp.com/connect-service-port": "{{ .Values.exposedPort }}"
+        "consul.hashicorp.com/connect-service-protocol": "tcp"
+
+    spec:
+      serviceAccountName: "{{ .Values.name }}"
+      automountServiceAccountToken: true
+      volumes:
+      - name: envoy
+        configMap:
+          name: "{{ .Values.name }}"
+      containers:
+      - name: "{{ .Values.name }}"
+        image: "envoyproxy/envoy:v1.14.2"
+        args:
+        - "--base-id"
+        - "1"
+        - "--config-path"
+        - "/etc/envoy/envoy.yaml"
+        volumeMounts:
+        - mountPath: "/etc/envoy"
+          name: "envoy"
+        ports:
+        - name: service
+          containerPort: {{ .Values.exposedPort }}
+        resources:
+          requests:
+            cpu: 5m
+            memory: 50Mi
+          limits:
+            cpu: 50m
+            memory: 75Mi

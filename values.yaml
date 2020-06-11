@@ -1,0 +1,5 @@
+name: ''
+host: example.com
+port: 80
+exposedPort: 8000
+tlsEnabled: false
